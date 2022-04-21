@@ -201,8 +201,8 @@ class Token {
         char kind;
         double value;
 
-    Token(char k) : kind{k}, value{0} { }
-    Token(char k, double v) : kind{k}, value{v} { }
+    Token (char k) : kind {k}, value {0} { }
+    Token (char k, double v) : kind {k}, value {v} { }
 };
 class Token_stream {
     public:
