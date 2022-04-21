@@ -198,11 +198,11 @@ catch(...) {
 
 class Token {
     public:
-        char kind;
-        double value;
+        char kind;              // тип лексемы
+        double value;           // значение лексемы
 
-    Token (char k) : kind {k}, value {0} { }
-    Token (char k, double v) : kind {k}, value {v} { }
+    Token (char k) : kind {k}, value {0} { }                // если это не число
+    Token (char k, double v) : kind {k}, value {v} { }      // если это число
 };
 class Token_stream {
     public:
