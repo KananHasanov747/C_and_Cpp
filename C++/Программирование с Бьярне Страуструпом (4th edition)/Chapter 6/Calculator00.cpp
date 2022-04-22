@@ -206,7 +206,7 @@ class Token {
 };
 class Token_stream {
     public:
-        Token get ();           // Получение лексемы (get () определна в §6.8.2)
+        Token get ();           // Получение лексемы (get () определена в §6.8.2)
         void putback (Token t); // Возврат лексемы в поток
     private:
         bool full { false };    // Имеется ли лексема в буфере?
@@ -229,6 +229,7 @@ Token Token_stream::get () {
                                 // пробельные символы
     switch (ch) {
         case ';':               // Для выхода
+        case '!':
         case 'q':               // Для выхода
         case '(': case ')': case '+':
         case '-': case '*': case '/':
@@ -281,6 +282,12 @@ double term () {
                 t = ts.get ();
                 break;
             }
+            case '!': { // упражнение 3
+                if (left == 0) left = 1;
+                for (int i = left - 1; i > 1; i--) left *= i;
+                t = ts.get ();
+                break;
+            }
             default:
                 ts.putback (t);         // Возврат t в поток лексем
                 return left;
@@ -322,10 +329,10 @@ int main () {
             val = expression ();
         }
     } catch(exception& e) {
-        cerr << "Exception: " << e.what() << '\n';
+        cerr << e.what() << '\n';
         return 1;
     } catch(...) {
-        cerr << "Unknown exception\n";
+        cerr << "исключение\n";
         return 2;
     }
 }
