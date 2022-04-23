@@ -1,4 +1,53 @@
-#include <std_lib_facilities.h>
+/*
+Грамматика:
+
+Вычисление:
+    Утверждение
+    Вывод
+    Выход
+    Вычисление Утверждение
+
+Утверждение:
+    Декларация
+    Выражение
+
+Вывод:
+    ;
+
+Выход:
+    q
+
+Декларация:
+    "let" name "=" Выражение
+
+Выражение:
+    Терм
+    Выражение "+" Терм
+    Выражение "-" Терм
+
+Терм:
+    Вторичное_выражение
+    Терм "*" Первичное_выражение
+    Терм "/" Первичное_выражение
+    Терм "%" Первичное_выражение
+
+Вторичное_выражение:
+    Первичное_выражение "!"
+
+Первичное_выражение:
+    Число
+    "(" Выражение ")"
+    "{" Выражение "}"
+    "-" Первичное_выражение
+    "+" Первичное_выражение
+    Переменная
+
+Число:
+    Литерал_с_плавающей_точкой
+
+*/
+
+#include "../std_lib_facilities.h"
 
 const char number = '8';        // t.kind == number означает, что t - число
 const char quit = 'q';          // t.kind == quit означает, что t = лексема выхода
@@ -8,8 +57,11 @@ const string prompt = "> ";
 const string result = "= ";     // Используется для указания на то,
                                 // что далее следует результат
 
+const char name = 'a';          // Лексема Имя
+const char let = 'L';           // Лексема let
+const string declkey = "let";   // Колючевое слово let
 
-class Token {
+class Token {                   // класс Лексема
     public:
         char kind;              // тип лексемы
         double value;           // значение лексемы
@@ -17,10 +69,10 @@ class Token {
 
     Token (char k) : kind {k}, value {0} { }                // Инициализирует kind символом ch
     Token (char k, double v) : kind {k}, value {v} { }      // Инициализирует kind и value
-    Token (char ch, string n) : kind {ch}, name {n} { }     // Инициализирует kind и name
+    Token (char ch, string n) : kind {ch}, value {0}, name {n} { }     // Инициализирует kind и name
 };
 
-class Token_stream {
+class Token_stream {            // класс Поток Лексем
     public:
         Token get ();           // Получение лексемы (get () определена в §6.8.2)
         void putback (Token t); // Возврат лексемы в поток
@@ -38,9 +90,6 @@ void Token_stream::putback (Token t) {
     full = true;                // Буфер заполнен
 }
 
-const char name = 'a';          // Лексема Имя
-const char let = 'L';           // Лексема let
-const string declkey = "let";   // Колючевое слово let
 
 Token Token_stream::get () {
     if (full) {
@@ -54,6 +103,7 @@ Token Token_stream::get () {
         case print:             // Для выхода
         case quit:              // Для выхода
         case '!': case '%':
+        case '{': case '}':
         case '(': case ')': case '+':
         case '-': case '*': case '/':
             return Token { ch };  // Символ представляет сам себя
@@ -71,7 +121,7 @@ Token Token_stream::get () {
                 while (cin.get (ch) &&
                         (isalpha (ch) || isdigit (ch))) s += ch;
                 cin.putback (ch);
-                if (s == declkey) return Token (let);   // Ключевое слово let
+                if (s == declkey) return Token {let};   // Ключевое слово let
                 return Token {name, s};
             }
             error ("Неверная лексема");
@@ -93,28 +143,37 @@ class Variable {
     public:
         string name;
         double value;
+    
+    Variable (string n, double v) : name {n}, value {v} {}
 };
 
-vector <Variable> var_table;
+class Symbol_table {
+    vector <Variable> var_table;
+    public:
+        double get_value (string);
+        double set_value (string, double);
+        bool is_declared (string);
+        double define_name (string, double);
+};
 
 // Возвращает значение переменной с именем 's'
-double get_value (string s) {
+double Symbol_table::get_value (string s) {
     for (const Variable& v : var_table)
         if (v.name == s) return v.value;
     error ("get: неопределенная переменная ", s);
 }
 
 // Присваивает объекту s типа Variable значение d
-void set_value (string s, double d) {
+double Symbol_table::set_value (string s, double d) {
     for (Variable& v : var_table) {
-        if (v.name == s) { v.value = d; return; }
+        if (v.name == s) { v.value = d; return d; }
     }
     error ("set: неопределенная переменная", s);
 }
 
 
 // Есть ли перемменная var в векторе var_table?
-bool is_declared (string var) {
+bool Symbol_table::is_declared (string var) {
     for (const Variable& v : var_table)
         if (v.name == var) return true;
     return false;
@@ -122,12 +181,13 @@ bool is_declared (string var) {
 
 
 // Добавляем пару (var, val) в вектор var_table
-double define_name (string var, double val) {
+double Symbol_table::define_name (string var, double val) {
     if (is_declared (var)) error (var, " повторное объявление");
     var_table.push_back (Variable (var, val));
 }
 
 Token_stream ts;                        // Предоставляет get () и putback ()
+Symbol_table st;
 double expression ();                   // Объявление для использования
                                         // в функции primary ()
 
@@ -140,7 +200,7 @@ double declaration () {
     if (t2.kind != '=') error ("пропущен символ '=' в объявлении ", var_name);
 
     double d = expression ();
-    define_name (var_name, d);
+    st.define_name (var_name, d);
     return d;
 }
 
@@ -154,6 +214,16 @@ double statement () {
     }
 }
 
+double handle_variable (Token& t)
+{
+    Token t2 = ts.get ();
+    if (t2.kind == '=') return st.set_value (t.name, expression ());
+    else {
+        ts.putback (t2);
+        return st.get_value (t.name);       // missing in text!
+    }
+}
+
 // Работа с числами и скобками
 double primary () {
     Token t = ts.get ();
@@ -164,25 +234,50 @@ double primary () {
             if (t.kind != ')') error ("требуется ')");
             return d;
         }
+        case '{': {
+            double d = expression ();
+            t = ts.get ();
+            if (t.kind != '}') error ("требуется ')");
+            return d;
+        }
         case number: return t.value;
+        case name: return handle_variable (t);
         case '-': return - primary ();
         case '+': return primary ();
         default: error ("требуется первичное значение");
     }
 }
 
-// Работа с *, /, ! и с %
-double term () {
+// Работа с !
+double secondary() {
     double left = primary ();
+    Token t = ts.get();
+
+    while (true) {
+        if (t.kind == '!') {
+            if (left == 0) return 1;
+            for (int i = left - 1; i > 0; --i) left *= i;
+            t = ts.get();
+        }
+        else {
+            ts.putback(t);
+            return left;
+        }
+    }
+}
+
+// Работа с *, / и %
+double term () {
+    double left = secondary ();
     Token t = ts.get ();                // Получаем следующую лексему
     while (true) {
         switch (t.kind) {
             case '*':
-                left *= primary ();
+                left *= secondary ();
                 t = ts.get ();
                 break;
             case '/': {
-                double d = primary ();
+                double d = secondary ();
                 if (d == 0) error ("деление на нуль");
                 left /= d;
                 t = ts.get ();
@@ -236,7 +331,6 @@ double expression () {
 }
 
 // Основной цикл и обработка ошибок
-
 void clean_up_mess () {         // Наивное решение
     ts.ignore (print);
 }
@@ -249,7 +343,7 @@ void calculate () {
             while (t.kind == print) t = ts.get ();  // Удаление вывода
             if (t.kind == quit) return;
             ts.putback (t);
-            cout << result << expression () << '\n';
+            cout << result << statement () << '\n';
         }
     } catch (exception& e) {
         cerr << e.what () << '\n';
@@ -261,8 +355,8 @@ void calculate () {
 int main () {
     try {
         // Предопределенные имена
-        define_name ("pi", 3.1415926535);
-        define_name ("e", 2.7182818284);
+        st.define_name ("pi", 3.1415926535);
+        st.define_name ("e", 2.7182818284);
 
         calculate ();
 
