@@ -12,7 +12,7 @@ int main () {
     cout << "(m = 2) -> &m = " << &m << endl; // & is mean that you get the address in memory of variable "m"
 
     int n = m; // create a new object with name "n" that have the same value as "m"
-    cout << "(n = m) -> &n = " << &n << endl; // the address of "m" is not the same as address of "m"
+    cout << "(n = m) -> &n = " << &n << endl; // the address of "n" is not the same as address of "m"
 
     int* ptr = &m; // pointers of m
     cout << "(*ptr = &m) -> ptr = " << ptr << endl;
@@ -302,3 +302,51 @@ int main () {
     }
 }
 */
+
+
+// Difference between pointers and references ( https://stackoverflow.com/questions/57483/what-are-the-differences-between-a-pointer-variable-and-a-reference-variable-in )
+
+int main () {
+    int x, y;
+// 1) *****************************************************************************************
+    cout << "1)\n";
+    // A pointer can be re-assigned
+    x = 5; y = 6;
+    int *p;
+    p = &x; p = &y;
+    *p = 10;
+    cout << "x == 5: " << (x == 5) << " x is " << x << endl;         // x == 5: 1 x is 5
+    cout << "y == 10: " << (y == 10) << " y is " << y << endl;       // y == 10: 1 y is 10
+
+    // A reference cannot be re-bound, and must be bound at initialization
+    x = 5; y = 6;
+    // int &q;  error
+    int &q = x;
+    q = y; q = 10;
+    cout << "x == 5: " << (x == 5) << " x is " << x << endl;         // x == 5: 0 x is 10
+    cout << "y == 10: " << (y == 10) << " y is " << y << endl;       // y == 10: 0 y is 6
+
+// 2) *****************************************************************************************
+    cout << "\n2)\n";
+    x = 0;
+    int &r = x;
+    int *k = &x;
+    int *k2 = &r;
+
+    cout << "k == k2: " << (k == k2) << endl;   // &x == &r
+    cout << "&k != &k2: " << (&k != &k2) << endl;
+
+// 3) *****************************************************************************************
+    cout << "\n3)\n";
+    x = 0; y = 0;
+    int *m = &x;
+    int *n = &y;
+    int **mm = &m;
+
+    **mm = 2;
+    mm = &n; // *mm is now n
+    **mm = 4;
+
+    cout << "y == 4: " << (y == 4) << " y is " << y << endl;        // y == 4: 1 y is 4
+    cout << "x == 2: " << (x == 2) << " x is " << x << endl;        // x == 2: 1 x is 2
+}
