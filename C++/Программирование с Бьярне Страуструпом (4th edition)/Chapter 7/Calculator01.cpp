@@ -118,7 +118,7 @@ Token Token_stream::get () {
         return buffer;          // Убираем его из буфера и возвращаем
     }
 
-    char ch; cin.get (ch);         // Заметим, что оператор >> пропускает
+    char ch; cin.get (ch);      // Заметим, что оператор >> пропускает
                                 // пробельные символы
 
     while (isspace (ch) && ch != '\n') cin.get (ch);
@@ -174,11 +174,11 @@ public:
 // Упражнение 4: class Symbol_table
 class Symbol_table {
     vector <Variable> var_table;
-    public:
-        double get_value (string);
-        double set_value (string, double);
-        bool is_declared (string);
-        double define_name (string, double, bool con = false);
+public:
+    double get_value (string);
+    double set_value (string, double);
+    bool is_declared (string);
+    double define_name (string, double, bool con = false);
 };
 
 // Возвращает значение переменной с именем 's'
@@ -246,7 +246,7 @@ double calc_sin () {
     if (cin.get (ch) && ch != '(') error ("требуется '('");
     cin.putback (ch);
     double d = expression ();
-    // if (d == 90 || d == 270) return 1;
+    if (d == 90 || d == 270) return 1;
     if (d == 0 || d == 180) return 0;
     return sin (d * 3.1415926535 / 180);
 }
@@ -256,38 +256,11 @@ double calc_cos () {
     if (cin.get (ch) && ch != '(') error ("требуется '('");
     cin.putback (ch);
     double d = expression ();
-    // if (d == 0 || d == 180) return 1;
+    if (d == 0 || d == 180) return 1;
     if (d == 90 || d == 270) return 0;      // return 0 instead of 8.766e-11
     return cos (d * 3.1415926535 / 180);
 }
 
-double declaration () {
-    // Считаем, что мы уже встретили ключевое слово "let "
-    // Обра батываем: Имя = Выражение
-    // Объявление переменной с Именем с начальным значением,
-    // заданным Выражением
-
-    Token t = ts.get ();
-    if (t.kind != name) error ("в объявлении ожидается имя переменной");
-    string var_name=  t.name;
-
-    Token t2 = ts.get ();
-    if (t2.kind != '=') error ("пропущен символ '=' в объявлении ", var_name);
-
-    double d = expression ();
-    st.define_name (var_name, d);
-    return d;
-}
-
-double statement () {
-    Token t = ts.get ();
-    switch (t.kind) {
-        case let: return declaration ();
-        default:
-            ts.putback (t);
-            return expression ();
-    }
-}
 // Упражнение 2
 double handle_variable (Token& t)
 {
@@ -363,13 +336,6 @@ double term () {
                 t = ts.get ();
                 break;
             }
-            case '!': { // упражнение 3
-                if (left < 0) error ("факториал отрицательного числа");
-                if (left == 0) left = 1;
-                for (int i = left - 1; i > 1; i--) left *= i;
-                t = ts.get ();
-                break;
-            }
             case '%': {
                 // double d = primary ();
                 // if (d == 0) error ("%: деление на нуль");
@@ -410,6 +376,34 @@ double expression () {
     }
 }
 
+double declaration () {
+    // Считаем, что мы уже встретили ключевое слово "let "
+    // Обра батываем: Имя = Выражение
+    // Объявление переменной с Именем с начальным значением,
+    // заданным Выражением
+
+    Token t = ts.get ();
+    if (t.kind != name) error ("в объявлении ожидается имя переменной");
+    string var_name=  t.name;
+
+    Token t2 = ts.get ();
+    if (t2.kind != '=') error ("пропущен символ '=' в объявлении ", var_name);
+
+    double d = expression ();
+    st.define_name (var_name, d);
+    return d;
+}
+
+double statement () {
+    Token t = ts.get ();
+    switch (t.kind) {
+        case let: return declaration ();
+        default:
+            ts.putback (t);
+            return expression ();
+    }
+}
+
 // Основной цикл и обработка ошибок
 void clean_up_mess () {         // Наивное решение
     ts.ignore (print);
@@ -432,8 +426,8 @@ void print_help()
 }
 
 void calculate () {
-    try {
-        while (cin) {
+    while (cin) {
+        try {
             cout << prompt;
             Token t = ts.get ();
             while (t.kind == print) t = ts.get ();  // Удаление вывода
@@ -443,10 +437,10 @@ void calculate () {
                 ts.putback (t);
                 cout << result << statement () << '\n';
             }
+        } catch (exception& e) {
+            cerr << e.what () << '\n';
+            clean_up_mess ();
         }
-    } catch (exception& e) {
-        cerr << e.what () << '\n';
-        clean_up_mess ();
     }
 }
 
@@ -460,7 +454,6 @@ int main () {
         cout << "Simple Calculator (type ? for help)\n";
 
         calculate ();
-
         return 0;
     } catch (exception& e) {
         cerr << e.what () << '\n';
