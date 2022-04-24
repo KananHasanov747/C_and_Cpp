@@ -246,10 +246,10 @@ double calc_sin () {
     Token t = ts.get ();
     if (t.kind != '(') error ("требуется '('");
     double d = expression ();
-    if (d == 90 || d == 270) return 1;
-    if (d == 0 || d == 180) return 0;
     t = ts.get ();
     if (t.kind != ')') error ("требуется ')'");
+    if (d == 90 || d == 270) return 1;
+    if (d == 0 || d == 180) return 0;
     return sin (d * 3.1415926535 / 180);
 }
 
@@ -257,10 +257,10 @@ double calc_cos () {
     Token t = ts.get ();
     if (t.kind != '(') error ("требуется '('");
     double d = expression ();
-    if (d == 0 || d == 180) return 1;
-    if (d == 90 || d == 270) return 0;      // return 0 instead of 8.766e-11
     t = ts.get ();
     if (t.kind != ')') error ("требуется ')'");
+    if (d == 0 || d == 180) return 1;
+    if (d == 90 || d == 270) return 0;      // return 0 instead of 8.766e-11
     return cos (d * 3.1415926535 / 180);
 }
 
