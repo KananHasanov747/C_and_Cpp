@@ -221,11 +221,12 @@ double expression ();                   // Объявление для испо�
                                         // в функции primary ()
 
 double calc_sqrt () {
-    char ch;
-    if (cin.get (ch) && ch != '(') error ("требуется '('");
-    cin.putback (ch);
+    Token t = ts.get ();
+    if (t.kind != '(') error ("требуется '('");
     double d = expression ();
     if (d < 0) error ("sqrt: отрцитальное значение невозможно");
+    t = ts.get ();
+    if (t.kind != ')') error ("требуется ')'");
     return sqrt (d);
 }
 
@@ -242,22 +243,24 @@ double calc_pow () {
 }
 
 double calc_sin () {
-    char ch;
-    if (cin.get (ch) && ch != '(') error ("требуется '('");
-    cin.putback (ch);
+    Token t = ts.get ();
+    if (t.kind != '(') error ("требуется '('");
     double d = expression ();
     if (d == 90 || d == 270) return 1;
     if (d == 0 || d == 180) return 0;
+    t = ts.get ();
+    if (t.kind != ')') error ("требуется ')'");
     return sin (d * 3.1415926535 / 180);
 }
 
 double calc_cos () {
-    char ch;
-    if (cin.get (ch) && ch != '(') error ("требуется '('");
-    cin.putback (ch);
+    Token t = ts.get ();
+    if (t.kind != '(') error ("требуется '('");
     double d = expression ();
     if (d == 0 || d == 180) return 1;
     if (d == 90 || d == 270) return 0;      // return 0 instead of 8.766e-11
+    t = ts.get ();
+    if (t.kind != ')') error ("требуется ')'");
     return cos (d * 3.1415926535 / 180);
 }
 
