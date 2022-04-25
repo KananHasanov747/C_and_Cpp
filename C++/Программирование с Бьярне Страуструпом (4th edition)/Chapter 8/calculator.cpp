@@ -1,37 +1,37 @@
-#include "token.h"                      // doesn't work
-// #include "token.cpp"                 // works
+// #include "token.h"                      // doesn't work
+#include "token.cpp"                 // works
 
 Token_stream ts;                        // Предоставляет get () и putback ()
 Symbol_table st;                        // Позволяет создавать и изменить переменные
-double expression ();                   // Объявление для использования
-                                        // в функции primary ()
+double expression (Token_stream&);      // Объявление для использования
+                                        // в функции primary (ts)
 
-double calc_sqrt () {
+double calc_sqrt (Token_stream& ts) {                   // Квадратный корень
     Token t = ts.get ();
     if (t.kind != '(') error ("требуется '('");
-    double d = expression ();
+    double d = expression (ts);
     if (d < 0) error ("sqrt: отрцитальное значение невозможно");
     t = ts.get ();
     if (t.kind != ')') error ("требуется ')'");
     return sqrt (d);
 }
 
-double calc_pow () {
+double calc_pow (Token_stream& ts) {                    // Степень
     Token t = ts.get ();
     if (t.kind != '(') error ("требуется '('");
-    double base = expression ();
+    double base = expression (ts);
     t = ts.get ();
     if (t.kind != ',') error ("',' пропущен");
-    int power = narrow_cast <int> (expression ());
+    int power = narrow_cast <int> (expression (ts));
     t = ts.get ();
     if (t.kind != ')') error("')' пропущен");
     return pow (base, power);
 }
 
-double calc_sin () {
+double calc_sin (Token_stream& ts) {                    // Синус
     Token t = ts.get ();
     if (t.kind != '(') error ("требуется '('");
-    double d = expression ();
+    double d = expression (ts);
     t = ts.get ();
     if (t.kind != ')') error ("требуется ')'");
     if (d == 90 || d == 270) return 1;
@@ -39,10 +39,10 @@ double calc_sin () {
     return sin (d * 3.1415926535 / 180);
 }
 
-double calc_cos () {
+double calc_cos (Token_stream& ts) {                    // Косинус
     Token t = ts.get ();
     if (t.kind != '(') error ("требуется '('");
-    double d = expression ();
+    double d = expression (ts);
     t = ts.get ();
     if (t.kind != ')') error ("требуется ')'");
     if (d == 0 || d == 180) return 1;
@@ -51,10 +51,10 @@ double calc_cos () {
 }
 
 // Упражнение 2
-double handle_variable (Token& t)
+double handle_variable (Token_stream& ts, Token& t)
 {
     Token t2 = ts.get ();
-    if (t2.kind == '=') return st.set_value (t.name, expression ());
+    if (t2.kind == '=') return st.set_value (t.name, expression (ts));
     else {
         ts.putback (t2);
         return st.get_value (t.name);       // missing in text!
@@ -62,36 +62,35 @@ double handle_variable (Token& t)
 }
 
 // Работа с числами и скобками
-double primary () {
+double primary (Token_stream& ts) {
     Token t = ts.get ();
     switch (t.kind) {
         case '(': {
-            double d = expression ();
+            double d = expression (ts);
             t = ts.get ();
             if (t.kind != ')') error ("требуется ')");
             return d;
         }
         case '{': {
-            double d = expression ();
+            double d = expression (ts);
             t = ts.get ();
             if (t.kind != '}') error ("требуется ')");
             return d;
         }
         case number: return t.value;
-        case name: return handle_variable (t);
-        case '-': return - primary ();
-        case '+': return primary ();
-        case square_root: return calc_sqrt ();
-        case exponent: return calc_pow ();
-        case c_sin: return calc_sin ();
-        case c_cos: return calc_cos ();
+        case name: return handle_variable (ts, t);
+        case '-': return - primary (ts);
+        case '+': return primary (ts);
+        case square_root: return calc_sqrt (ts);
+        case exponent: return calc_pow (ts);
+        case c_sin: return calc_sin (ts);
+        case c_cos: return calc_cos (ts);
         default: error ("требуется первичное значение");
     }
 }
 
-// Работа с !
-double secondary() {
-    double left = primary ();
+double secondary (Token_stream& ts) {       // Работа с !
+    double left = primary (ts);
     Token t = ts.get();
 
     while (true) {
@@ -109,28 +108,28 @@ double secondary() {
 }
 
 // Работа с *, / и %
-double term () {
-    double left = secondary ();
+double term (Token_stream& ts) {
+    double left = secondary (ts);
     Token t = ts.get ();                // Получаем следующую лексему
     while (true) {
         switch (t.kind) {
             case '*':
-                left *= secondary ();
+                left *= secondary (ts);
                 t = ts.get ();
                 break;
             case '/': {
-                double d = secondary ();
+                double d = secondary (ts);
                 if (d == 0) error ("деление на нуль");
                 left /= d;
                 t = ts.get ();
                 break;
             }
             case '%': {
-                // double d = primary ();
+                // double d = primary (ts);
                 // if (d == 0) error ("%: деление на нуль");
                 // left = fmod (left, d);
                 int i1 = narrow_cast <int> (left);
-                int i2 = narrow_cast <int> (primary ());
+                int i2 = narrow_cast <int> (primary (ts));
                 if (i2 == 0) error ("%: деление на нуль");
                 left = i1 % i2;
                 t = ts.get ();
@@ -144,17 +143,17 @@ double term () {
 }
 
 // Работа с + и -
-double expression () {
-    double left = term ();              // Считываем и вычисляем Терм
+double expression (Token_stream& ts) {
+    double left = term (ts);              // Считываем и вычисляем Терм
     Token t = ts.get ();                // Получаем следующую лексему
     while (true) {
         switch (t.kind) {
             case '+':
-                left += term ();        // Вычисляем Терм и суммируем
+                left += term (ts);        // Вычисляем Терм и суммируем
                 t = ts.get ();
                 break;
             case '-':
-                left -= term ();        // Вычисляем Терм и вычитаем
+                left -= term (ts);        // Вычисляем Терм и вычитаем
                 t = ts.get ();
                 break;
             default:
@@ -165,7 +164,7 @@ double expression () {
     }
 }
 
-double declaration () {
+double declaration (Token_stream& ts) {
     // Считаем, что мы уже встретили ключевое слово "let "
     // Обра батываем: Имя = Выражение
     // Объявление переменной с Именем с начальным значением,
@@ -178,18 +177,18 @@ double declaration () {
     Token t2 = ts.get ();
     if (t2.kind != '=') error ("пропущен символ '=' в объявлении ", var_name);
 
-    double d = expression ();
+    double d = expression (ts);
     st.define_name (var_name, d);
     return d;
 }
 
-double statement () {
+double statement (Token_stream& ts) {
     Token t = ts.get ();
     switch (t.kind) {
-        case let: return declaration ();
+        case let: return declaration (ts);
         default:
             ts.putback (t);
-            return expression ();
+            return expression (ts);
     }
 }
 
@@ -215,21 +214,20 @@ void print_help()
 }
 
 void calculate () {
-    while (cin) {
-        try {
-            cout << prompt;
+    try {
+        while (cin && cout << prompt) {
             Token t = ts.get ();
             while (t.kind == print) t = ts.get ();  // Удаление вывода
             if (t.kind == help) print_help ();
             else if (t.kind == quit) return;
             else {
                 ts.putback (t);
-                cout << result << statement () << '\n';
+                cout << result << statement (ts) << '\n';
             }
-        } catch (exception& e) {
-            cerr << e.what () << '\n';
-            clean_up_mess ();
         }
+    } catch (exception& e) {
+        cerr << e.what () << '\n';
+        clean_up_mess ();
     }
 }
 

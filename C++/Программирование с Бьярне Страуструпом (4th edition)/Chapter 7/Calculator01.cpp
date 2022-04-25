@@ -78,7 +78,7 @@ public:
     double value;               // значение лексемы
     string name;
 
-    Token (char k) : kind {k}, value {0} { }                // Инициализирует kind символом ch
+    Token (char k) : kind {k}, value {0} { }                // Инициализирует kind символом k
     Token (char k, double v) : kind {k}, value {v} { }      // Инициализирует kind и value
     Token (char ch, string n) : kind {ch}, value {0}, name {n} { }     // Инициализирует kind и name
 };
@@ -381,7 +381,7 @@ double expression () {
 
 double declaration () {
     // Считаем, что мы уже встретили ключевое слово "let "
-    // Обра батываем: Имя = Выражение
+    // Обрабатываем: Имя = Выражение
     // Объявление переменной с Именем с начальным значением,
     // заданным Выражением
 

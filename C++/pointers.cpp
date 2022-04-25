@@ -312,7 +312,7 @@ int main () {
     cout << "1)\n";
     // A pointer can be re-assigned
     x = 5; y = 6;
-    int *p;
+    int* p;
     p = &x; p = &y;
     *p = 10;
     cout << "x == 5: " << (x == 5) << " x is " << x << endl;         // x == 5: 1 x is 5
@@ -321,7 +321,7 @@ int main () {
     // A reference cannot be re-bound, and must be bound at initialization
     x = 5; y = 6;
     // int &q;  error
-    int &q = x;
+    int& q = x;
     q = y; q = 10;
     cout << "x == 5: " << (x == 5) << " x is " << x << endl;         // x == 5: 0 x is 10
     cout << "y == 10: " << (y == 10) << " y is " << y << endl;       // y == 10: 0 y is 6
@@ -329,9 +329,9 @@ int main () {
 // 2) *****************************************************************************************
     cout << "\n2)\n";
     x = 0;
-    int &r = x;
-    int *k = &x;
-    int *k2 = &r;
+    int& r = x;
+    int* k = &x;
+    int* k2 = &r;
 
     cout << "k == k2: " << (k == k2) << endl;   // &x == &r
     cout << "&k != &k2: " << (&k != &k2) << endl;
@@ -339,9 +339,9 @@ int main () {
 // 3) *****************************************************************************************
     cout << "\n3)\n";
     x = 0; y = 0;
-    int *m = &x;
-    int *n = &y;
-    int **mm = &m;
+    int* m = &x;
+    int* n = &y;
+    int** mm = &m;
 
     **mm = 2;
     mm = &n; // *mm is now n

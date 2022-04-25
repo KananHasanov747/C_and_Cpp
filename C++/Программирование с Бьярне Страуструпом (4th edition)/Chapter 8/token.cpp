@@ -12,7 +12,7 @@ void Token_stream::ignore (char c) {
 }
 
 void Token_stream::putback (Token t) {
-    // if (full) error ("putback (): буфер заполнен");
+    if (full) error ("putback (): буфер заполнен");
     buffer = t;                 // Копируем t в буфер
     full = true;                // Буфер заполнен
 }

@@ -29,7 +29,7 @@ public:
     double value;               // значение лексемы
     string name;
 
-    Token (char k) : kind {k}, value {0} { }                // Инициализирует kind символом ch
+    Token (char k) : kind {k}, value {0} { }                // Инициализирует kind символом k
     Token (char k, double v) : kind {k}, value {v} { }      // Инициализирует kind и value
     Token (char ch, string n) : kind {ch}, value {0}, name {n} { }     // Инициализирует kind и name
 };
