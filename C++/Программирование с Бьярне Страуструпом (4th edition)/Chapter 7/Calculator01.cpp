@@ -119,9 +119,10 @@ Token Token_stream::get () {
     }
 
     char ch; cin.get (ch);      // Заметим, что оператор >> пропускает
+    // cin >> ch;               // Если мы не используем '\n' как print
                                 // пробельные символы
 
-    while (isspace (ch) && ch != '\n') cin.get (ch);
+    while (isspace (ch) && ch != '\n') cin.get (ch);    // Если нет cin >> ch и если использовать '\n' как print
 
     switch (ch) {
         case '\n': return Token { print };

@@ -41,3 +41,7 @@ int main () {
 //     constexpr Point scale (Point p) { return { xscale * p.x, yscale * p.y }; };
 
 // }
+
+void print (const vector <int>& x) {
+    for (int i : x) cout << i << endl;
+}

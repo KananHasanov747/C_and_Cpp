@@ -76,5 +76,6 @@
         "functional": "cpp",
         "iterator": "cpp",
         "utility": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
 }
