@@ -1,6 +1,6 @@
+// #include "../std_lib_facilities.h"
 #include <iostream>
 #include <initializer_list>
-// #include "../std_lib_facilities.h"
 using std::cout;
 using std::endl;
 using std::initializer_list;
@@ -10,6 +10,8 @@ class vector {
     int sz;             // Размер
     double* elem;       // Указатель на элементы
 public:
+    vector (vector&&);  // Перемещающий конструктор
+    vector& operator= (vector&&);       // Перемещающее присваивание
     vector& operator= (const vector&);  // Копирующее присваивание
     vector (const vector&);     // Копирующий конструктор
     vector (int s) : sz {s}, elem {new double [s]}  // Конструктор
@@ -44,6 +46,23 @@ vector& vector::operator= (const vector& a) {
     return *this;                           // Возврат ссылки на себя
 }
 
+// Перемещающий конструктор
+vector::vector (vector&& a) 
+: sz {a.sz}, elem {a.elem} {    // Копируем elem и sz из a
+    a.sz = 0;                   // Делаем вектор а пустым
+    a.elem = nullptr;
+}
+
+// Перемещающее присваивание
+vector& vector::operator= (vector&& a) {    // Перемещаем 'a' в текущий вектор
+    delete[] elem;      // Освобождение старой памяти
+    elem = a.elem;      // Копирование elem и sz из a
+    sz = a.sz;
+    a.elem = nullptr;   // Делаем вектор 'a' пустым
+    a.sz = 0;
+    return *this;       // Возврат ссылки на себя
+}
+
 void print_all (vector& arg) {
     cout << "{ ";
     for (int i = 0; i < arg.size (); ++i) cout << arg.get (i) << ' ';
@@ -51,11 +70,13 @@ void print_all (vector& arg) {
 }
 
 int main () {
-    vector v (3);
-    v.set (2, 2.2);
-    vector v2 {v};
-    // vector v2 (4);
-    // v2 = v;
+    // vector v (3);
+    // v.set (2, 2.2);
+
+    // vector v2 {v};
+    // vector v2 (4); v2 = v;
+    // v2.set (0, 1.5);
+
     // print_all (v);
-    print_all (v2);
+    // print_all (v2);
 }
