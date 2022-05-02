@@ -76,7 +76,9 @@
         "functional": "cpp",
         "iterator": "cpp",
         "utility": "cpp",
-        "version": "cpp"
+        "version": "cpp",
+        "memory_resource": "cpp",
+        "__functional_03": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
