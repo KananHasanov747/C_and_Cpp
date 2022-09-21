@@ -34,7 +34,7 @@
     int_least64_t _int_least64_t;
 
     intmax_t _intmax_t;
-    intptr_t _intprt_t;
+    intptr_t _intptr_t;
 
     // ???
     ino_t _ino_t;
@@ -91,4 +91,4 @@
     unsigned long long _u_dlong;            // unsigned long long (equivalent to 'unsigned long long int')
     unsigned long long int _u_dlong_int;    // unsigned long long int (64 bit) [0 to 18,446,744,073,709,551,615]
 
-// This is no the full list of all types. The full list of types in this link: https://docs.microsoft.com/en-gb/cpp/c-runtime-library/standard-types?view=msvc-170
+// This is not the full list of all types. The full list of types in this link: https://docs.microsoft.com/en-gb/cpp/c-runtime-library/standard-types?view=msvc-170

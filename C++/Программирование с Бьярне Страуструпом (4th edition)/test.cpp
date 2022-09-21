@@ -259,12 +259,30 @@ int main () {
 }
 */
 
-class Example {
-    public:
-        ~Example () {cout << "Destructor!" << endl;}
-};
+// class Example {
+//     public:
+//         ~Example () {cout << "Destructor!" << endl;}
+// };
+
+// int main () {
+//     Example * t = new Example;
+//     delete t; // print "Destructor!"
+// }
+
+/*
+#include <iostream>
+#include <regex>
+#include <string>
+
+std::vector<std::string> split (const std::string str, const std::string regex_str)
+{
+    std::regex regexz(regex_str);
+    std::vector<std::string> list(std::sregex_token_iterator(str.begin(), str.end(), regexz, -1),
+                                  std::sregex_token_iterator());
+    return list;
+}
+*/
 
 int main () {
-    Example * t = new Example;
-    delete t; // print "Destructor!"
+    cout << pow (5, .5) << endl;
 }

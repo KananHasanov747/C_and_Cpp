@@ -305,7 +305,7 @@ int main () {
 
 
 // Difference between pointers and references ( https://stackoverflow.com/questions/57483/what-are-the-differences-between-a-pointer-variable-and-a-reference-variable-in )
-
+/*
 int main () {
     int x, y;
 // 1) *****************************************************************************************
@@ -350,3 +350,4 @@ int main () {
     cout << "y == 4: " << (y == 4) << " y is " << y << endl;        // y == 4: 1 y is 4
     cout << "x == 2: " << (x == 2) << " x is " << x << endl;        // x == 2: 1 x is 2
 }
+*/
