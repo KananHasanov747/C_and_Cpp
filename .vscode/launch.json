@@ -5,35 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "CodeLLDB debug",
+            "name": "clang++ - Build and debug active file",
             "type": "lldb",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "externalConsole": true,
-            "customLaunchSetupCommands": [
-                { "text": "target-run", "description": "run target", "ignoreFailures": false }
-              ],
-            "launchCompleteCommand": "exec-run",
-            // "MIMode": "lldb",
-            // "preLaunchTask": "clang++ build active file"
-        },
-        {
-            "name": "clang++ - Build and debug active file",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}",
             "args": [],
-            "stopAtEntry": false,
+            // "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
+            // "environment": [],
+            // "externalConsole": false,
             // "customLaunchSetupCommands": [
             //     { "text": "target-run", "description": "run target", "ignoreFailures": false }
             //   ],
             // "launchCompleteCommand": "exec-run",
-            "MIMode": "lldb",
+            // "MIMode": "lldb",
             "preLaunchTask": "clang++ build active file"
           }
     ]
