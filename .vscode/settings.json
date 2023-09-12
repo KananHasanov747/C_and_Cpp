@@ -78,7 +78,10 @@
         "utility": "cpp",
         "version": "cpp",
         "memory_resource": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "queue": "cpp",
+        "filesystem": "cpp",
+        "__verbose_abort": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Enabled"
+    "C_Cpp.errorSquiggles": "enabled"
 }
